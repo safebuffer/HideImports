@@ -31,7 +31,13 @@ unsigned __int64 FindDLLBase(const char* dll_name)
     // Get Thread Environment Block
     // https://docs.microsoft.com/en-us/windows/win32/api/winternl/ns-winternl-peb_ldr_data
     // https://blog.christophetd.fr/hiding-windows-api-imports-with-a-customer-loader/
+#if defined(_WIN64)
     PTEB teb = reinterpret_cast<PTEB>(__readgsqword(offsetof(NT_TIB, Self)));
+#elif defined(_WIN32)
+    PTEB teb = reinterpret_cast<PTEB>(__readfsdword(offsetof(NT_TIB, Self)));
+#else
+    return 0x0;
+#endif
     //typedef struct _LDR_DATA_TABLE_ENTRY {
     //    LIST_ENTRY InMemoryOrderLinks;
     //    PVOID DllBase;
